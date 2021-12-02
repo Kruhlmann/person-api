@@ -1,0 +1,42 @@
+version: '2'
+services:
+    message-server:
+        container_name: api
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        ports:
+            - 8080:8080
+        networks:
+            - web
+networks:
+    web:
+        driver: bridge
+        
+        version: "3.7"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - apidb
+    networks:
+      - internal
+
+  apidb:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - internal
+
+networks:
+  internal:
